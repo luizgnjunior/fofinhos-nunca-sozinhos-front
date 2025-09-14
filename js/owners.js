@@ -36,6 +36,19 @@ function hideOwnerForm() {
   document.getElementById("address").value = "";
   document.getElementById("notes").value = "";
 
+  const inputs = document.querySelectorAll("#owner-form-card .form-control");
+  inputs.forEach((input) => {
+    input.classList.remove("is-valid", "is-invalid");
+  });
+
+  const feedbacks = document.querySelectorAll(
+    "#owner-form-card .invalid-feedback"
+  );
+
+  feedbacks.forEach((msg) => {
+    msg.classList.add("d-none");
+  });
+
   document.getElementById("submit-button").textContent = "Confirmar";
   document.getElementById("submit-button").disabled = false;
 
@@ -201,14 +214,17 @@ function validateFormFieldsInfo() {
   fields.forEach(({ id, min }) => {
     const input = document.getElementById(id);
     const value = input.value.trim();
+    const feedback = input.nextElementSibling;
 
     if (value.length < min) {
       input.classList.add("is-invalid");
       input.classList.remove("is-valid");
+      if (feedback) feedback.classList.remove("d-none");
       isValid = false;
     } else {
       input.classList.remove("is-invalid");
       input.classList.add("is-valid");
+      if (feedback) feedback.classList.add("d-none");
     }
   });
 
