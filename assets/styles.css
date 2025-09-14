@@ -9,3 +9,7 @@ body {
 .min-card {
   min-height: 40vh;
 }
+
+.brown {
+  color: #7a2c00;
+}
