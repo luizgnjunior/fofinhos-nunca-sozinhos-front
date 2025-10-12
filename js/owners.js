@@ -90,7 +90,7 @@ async function getOwners() {
       setTimeout(() => {
         tableWrapper.classList.add("show");
       }, 10);
-    }, 3000);
+    }, 1000);
   } catch (error) {
     console.error(error);
     alert("Erro ao carregar tutores");
@@ -254,6 +254,7 @@ async function createOrUpdateOwner(event) {
       if (!response.ok) throw new Error("Erro ao editar tutor");
 
       showToast("toastUpdated");
+      editingOwnerId = null;
     } else {
       const response = await fetch(`${API_URL}`, {
         method: "POST",
@@ -346,5 +347,4 @@ document.addEventListener("DOMContentLoaded", () => {
   allowOnlyNumbers("phone");
   applyPhoneMask("phone");
   allowOnlyLetters("name");
-  allowOnlyLetters("address");
 });

@@ -22,13 +22,13 @@
       rel="icon"
       href="data:image/svg+xml,
   <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>
-    <text y='.9em' font-size='80'>👤</text>
+    <text y='.9em' font-size='80'>🐶</text>
   </svg>"
     />
 
     <link rel="stylesheet" href="./assets/styles.css" />
 
-    <title>FNS - TUTORES</title>
+    <title>FNS - PETS!</title>
   </head>
 
   <body>
@@ -63,10 +63,10 @@
               >
             </li>
             <li class="nav-item">
-              <a class="nav-link active" href="/owners.html">Tutores</a>
+              <a class="nav-link" href="/owners.html">Tutores</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/pets.html">Pets</a>
+              <a class="nav-link active" href="/pets.html">Pets</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="/takers.html">Cuidadores</a>
@@ -77,109 +77,96 @@
     </nav>
 
     <main class="container mt-5 mb-5 main-cal">
-      <!-- Botão alinhado à direita -->
       <div class="row mb-4">
         <div class="col text-end">
-          <button class="btn btn-warning" onclick="showOwnerForm()">
-            👤 Adicionar Tutor
+          <button class="btn btn-warning" onclick="showPetForm()">
+            🐾 Adicionar Pet
           </button>
         </div>
       </div>
 
-      <div class="row fade d-none" id="owner-form-card">
+      <!-- FORMULÁRIO -->
+      <div class="row fade d-none" id="pet-form-card">
         <div class="col-12">
           <div class="bg-white rounded shadow-sm p-4">
             <h5 class="mb-3">Informe os dados</h5>
-            <form onsubmit="createOrUpdateOwner(event)">
+            <form onsubmit="createOrUpdatePet(event)">
               <div class="row mb-3">
-                <div class="col-md-4">
+                <div class="col-md-3">
                   <label for="name" class="form-label">Nome*</label>
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="name"
-                    placeholder="Insira aqui..."
-                  />
-                  <div class="invalid-feedback">Mínimo de 6 caracteres</div>
+                  <input type="text" class="form-control" id="name" />
+                  <div class="invalid-feedback">Mínimo de 3 caracteres</div>
                 </div>
-                <div class="col-md-4">
-                  <label for="phone" class="form-label">Telefone*</label>
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="phone"
-                    placeholder="Insira aqui..."
-                  />
-                  <div class="invalid-feedback">Mínimo de 6 caracteres</div>
+                <div class="col-md-3">
+                  <label for="age" class="form-label"
+                    >Idade
+                    <span class="small text-muted">(Em anos)</span></label
+                  >
+                  <input type="number" class="form-control" id="age" min="0" />
                 </div>
-                <div class="col-md-4">
-                  <label for="address" class="form-label">Endereço*</label>
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="address"
-                    placeholder="Insira aqui..."
-                  />
-                  <div class="invalid-feedback">Mínimo de 6 caracteres</div>
+                <div class="col-md-3">
+                  <label for="size" class="form-label">Porte</label>
+                  <select class="form-select" id="size">
+                    <option value="">Selecione</option>
+                    <option value="Pequeno">Pequeno</option>
+                    <option value="Médio">Médio</option>
+                    <option value="Grande">Grande</option>
+                  </select>
+                </div>
+                <div class="col-md-3">
+                  <label for="ownerId" class="form-label">Tutor</label>
+                  <select class="form-select" id="ownerId">
+                    <!-- Opções dinâmicas -->
+                  </select>
                 </div>
               </div>
 
-              <div class="mb-4">
+              <div class="mb-3">
                 <label for="notes" class="form-label">Observações</label>
-                <textarea
-                  class="form-control"
-                  id="notes"
-                  rows="3"
-                  placeholder="Insira aqui..."
-                ></textarea>
+                <textarea class="form-control" id="notes" rows="2"></textarea>
               </div>
 
-              <!-- Botões alinhados à direita -->
-              <div class="row">
-                <div class="col text-end">
-                  <button
-                    type="button"
-                    class="btn btn-secondary me-2"
-                    onclick="hideOwnerForm()"
-                  >
-                    Cancelar
-                  </button>
-                  <button
-                    type="submit"
-                    class="btn btn-warning"
-                    id="submit-button"
-                  >
-                    Confirmar
-                  </button>
-                </div>
+              <div class="text-end">
+                <button
+                  type="button"
+                  class="btn btn-secondary me-2"
+                  onclick="hidePetForm()"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  class="btn btn-warning"
+                  id="submit-button"
+                >
+                  Confirmar
+                </button>
               </div>
             </form>
           </div>
         </div>
       </div>
 
-      <div class="row fade show mt-4" id="owners-table-card">
+      <!-- LOADING -->
+      <div class="row">
         <div class="col-12">
-          <div class="bg-white rounded shadow-sm p-4">
-            <div
-              id="loading-indicator"
-              class="d-flex flex-column justify-content-center align-items-center d-none py-5"
-            >
-              <div class="spinner-border text-warning" role="status">
-                <span class="visually-hidden">Carregando...</span>
-              </div>
-              <h4 class="mt-3 text-muted">Estamos procurando os tutores...</h4>
+          <div
+            class="bg-white rounded shadow-sm p-4 min-card d-flex flex-column justify-content-center align-items-center d-none"
+            id="loading-indicator"
+          >
+            <div class="spinner-border text-warning" role="status">
+              <span class="visually-hidden">Carregando...</span>
             </div>
+            <p class="mt-3 text-muted">Carregando pets...</p>
+          </div>
+        </div>
+      </div>
 
-            <div id="owners-table-wrapper" class="d-none fade">
-              <span id="owners-table-container" class="fade show">
-                <div class="table-responsive">
-                  <table class="table table-hover align-middle mb-0">
-                    <tbody id="owners-table-body"></tbody>
-                  </table>
-                </div>
-              </span>
-            </div>
+      <!-- TABELA -->
+      <div class="row fade show" id="pets-table-card">
+        <div class="col-12">
+          <div class="bg-white rounded shadow-sm p-4" id="pets-table-wrapper">
+            <div id="pets-table-container"></div>
           </div>
         </div>
       </div>
@@ -274,9 +261,7 @@
               aria-label="Fechar"
             ></button>
           </div>
-          <div class="modal-body">
-            Tem certeza que deseja excluir este tutor?
-          </div>
+          <div class="modal-body">Tem certeza que deseja excluir este Pet?</div>
           <div class="modal-footer">
             <button
               type="button"
@@ -288,7 +273,7 @@
             <button
               type="button"
               class="btn btn-danger"
-              onclick="confirmDeleteOwner()"
+              onclick="confirmDeletePet()"
             >
               Confirmar exclusão
             </button>
@@ -297,7 +282,7 @@
       </div>
     </div>
 
-    <script src="./js/owners.js"></script>
+    <script src="./js/pets.js"></script>
 
     <!-- Script para obter o ano atual -->
     <script>
