@@ -42,10 +42,12 @@ function hideCaretakerForm() {
       (opt) => (opt.selected = false)
     );
   }
-  const servicesSelect = document.getElementById("services");
-  if (servicesSelect) {
-    Array.from(servicesSelect.options).forEach((opt) => (opt.selected = false));
-  }
+
+  const dayBoxes = document.querySelectorAll('input[id^="day-"]');
+  dayBoxes.forEach((b) => (b.checked = false));
+
+  const serviceBoxes = document.querySelectorAll('input[id^="service-"]');
+  serviceBoxes.forEach((b) => (b.checked = false));
 
   document.getElementById("notes").value = "";
 
@@ -116,6 +118,56 @@ async function getCaretakers() {
   }
 }
 
+function translateServiceArray(arr) {
+  if (!Array.isArray(arr) || arr.length === 0) return "-";
+
+  const serviceMap = {
+    walking: "Passeio",
+    grooming: "Tosa / Higiene",
+    feeding: "Alimentação",
+    boarding: "Hospedagem",
+    training: "Treinamento",
+  };
+
+  return arr
+    .map((item) => {
+      const translated = serviceMap[item] || item;
+
+      return `
+        <span class="badge bg-light text-dark">
+          ${translated}
+        </span>
+      `;
+    })
+    .join(" ");
+}
+
+function translateDayArray(arr) {
+  if (!Array.isArray(arr) || arr.length === 0) return "-";
+
+  const dayMap = {
+    monday: "Segunda",
+    tuesday: "Terça",
+    wednesday: "Quarta",
+    thursday: "Quinta",
+    friday: "Sexta",
+    saturday: "Sábado",
+    sunday: "Domingo",
+  };
+
+  return arr
+    .map((item) => {
+      const translated = dayMap[item] || item;
+
+      return `
+        <span class="badge bg-success">
+          ${translated}
+        </span>
+      `;
+    })
+    .join(" ");
+}
+
 function renderCaretakersTable(caretakers) {
   const tableWrapper = document.getElementById("caretakers-table-wrapper");
   const tableContainer = document.getElementById("caretakers-table-container");
@@ -157,16 +209,12 @@ function renderCaretakersTable(caretakers) {
                 <td>${c.name}</td>
                 <td>${c.phone}</td>
                 <td>${c.address}</td>
-                <td>${
-                  Array.isArray(c.availableDays) && c.availableDays.length
-                    ? c.availableDays.join(", ")
-                    : " - "
-                }</td>
-                <td>${
-                  Array.isArray(c.services) && c.services.length
-                    ? c.services.join(", ")
-                    : " - "
-                }</td>
+                <td>${translateDayArray(c.availableDays)}</td>
+                 <td>
+                 ${translateServiceArray(c.services)}
+                 
+                 </td>
+               
                 <td>${c.notes ? c.notes : " - "}</td>
                 <td class="text-end">
                   <button class="btn btn-sm btn-outline-primary" title="Editar" onclick="editCaretaker('${
@@ -311,6 +359,13 @@ function validateFormFieldsInfo() {
   return isValid;
 }
 
+function getSelectedValuesByName(name, formSelector = "#caretaker-form-card") {
+  const checked = Array.from(
+    document.querySelectorAll(`${formSelector} input[name="${name}"]:checked`)
+  );
+  return checked.map((el) => el.value);
+}
+
 async function createOrUpdateCaretaker(event) {
   event.preventDefault();
 
@@ -320,30 +375,13 @@ async function createOrUpdateCaretaker(event) {
   const phone = document.getElementById("phone").value.trim();
   const address = document.getElementById("address").value.trim();
 
-  const availableDaysEl = document.getElementById("availableDays");
-  let availableDays = [];
-  if (availableDaysEl) {
-    if (availableDaysEl.multiple) {
-      availableDays = Array.from(availableDaysEl.options)
-        .filter((o) => o.selected)
-        .map((o) => o.value);
-    } else {
-      availableDays = availableDaysEl.value ? [availableDaysEl.value] : [];
-    }
-  }
+  const availableDays = Array.from(
+    document.querySelectorAll('input[id^="day-"]:checked')
+  ).map((d) => d.value);
 
-  const servicesEl = document.getElementById("services");
-  let services = [];
-  if (servicesEl) {
-    if (servicesEl.multiple) {
-      services = Array.from(servicesEl.options)
-        .filter((o) => o.selected)
-        .map((o) => o.value);
-    } else {
-      services = servicesEl.value ? [servicesEl.value] : [];
-    }
-  }
-
+  const services = Array.from(
+    document.querySelectorAll('input[id^="service-"]:checked')
+  ).map((s) => s.value);
   const notes = document.getElementById("notes").value.trim();
 
   const caretakerData = {
@@ -386,6 +424,22 @@ async function createOrUpdateCaretaker(event) {
   }
 }
 
+function checkAllDays(day) {
+  document
+    .querySelectorAll(`input[type="checkbox"][id^=day-${day}]`)
+    .forEach((cb) => {
+      cb.checked = true;
+    });
+}
+
+function checkAllServices(service) {
+  document
+    .querySelectorAll(`input[type="checkbox"][id^=service-${service}]`)
+    .forEach((cb) => {
+      cb.checked = true;
+    });
+}
+
 async function editCaretaker(id) {
   try {
     const response = await fetch(`${API_URL}`);
@@ -405,6 +459,14 @@ async function editCaretaker(id) {
 
     // Aguarda um pequeno delay para garantir que selects/DOM estejam prontos
     setTimeout(() => {
+      c.availableDays.forEach((d) => {
+        checkAllDays(d);
+      });
+
+      c.services.forEach((s) => {
+        checkAllServices(s);
+      });
+
       // availableDays
       const availableDaysEl = document.getElementById("availableDays");
       if (availableDaysEl && Array.isArray(c.availableDays)) {
