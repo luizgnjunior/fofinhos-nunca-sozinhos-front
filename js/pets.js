@@ -27,7 +27,6 @@ async function getPets() {
     if (!response.ok) throw new Error("Erro ao buscar pets");
 
     const pets = await response.json();
-    console.log("🚀 ~ getPets ~ pets:", pets);
 
     setTimeout(() => {
       renderPetsTable(pets);
